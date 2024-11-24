@@ -59,8 +59,8 @@ def forward_interpolation(nodes):
             L += f_func(nodes[k]) * (numerator / denominator)
 
 
-        y = sp.nsolve(L, x, 0)
-        return y, L
+        root = sp.nsolve(L, x, 0)
+        return root, L
 
 def backward_intepolation(nodes):
     #if not sp.is_monotonic(f, sp.Interval.open(a, b)):
@@ -78,8 +78,9 @@ def backward_intepolation(nodes):
             
             L += nodes[k] * (numerator / denominator)
     
-        x = sp.nsolve(L, y, 0)
-        return x, L
+        L_func = sp.lambdify(y, L)
+        root = L_func(0) 
+        return root, L
 
 # Пошук точного розв'язку
 x = sp.Symbol('x')
