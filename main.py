@@ -43,16 +43,21 @@ def lagrange_interpolation(x, nodes):
 
     return L
 
-def direct_interpolation(nodes, f):
-    print("Direct interpolation")
+def direct_interpolation(nodes):
+    x = sp.Symbol('x')
+    L = lagrange_interpolation(x, nodes)
+
+    y = sp.nsolve(L, x, 0)
+    return y
 
 # Пошук точного розв'язку
 x = sp.Symbol('x')
 f = np.e ** x - 2 * (x - 1) ** 2
+#f = sp.ln(x) + x - 2
 f_func = sp.lambdify(x, f)
 print(f"Функція: {f}")
 
-exact_solution = sp.nsolve(f, x, 0)
+exact_solution = sp.nsolve(f, x, 1)
 print(f"Точний розв'язок: {exact_solution}")
 
 # Дослідження інтервалу
@@ -69,3 +74,7 @@ n = m - 1 # степінь полінома
 # Отримання рівновіддалених вузлів інтерполяції
 nodes = get_nodes(a, b, m)
 print(f"Вузли інтерполяції: {nodes}\nКрок інтерполяції: {nodes[1] - nodes[0]}")
+
+# Пряма інтерполяція
+direct_solution = direct_interpolation(nodes)
+print(f"Пряма інтерполяція: {direct_solution}")
