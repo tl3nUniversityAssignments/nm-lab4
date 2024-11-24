@@ -39,16 +39,47 @@ def lagrange_interpolation(x, nodes):
             denominator *= (nodes[k] - nodes[j])
         
         L += f_func(nodes[k]) * (numerator / denominator)
-        #print(L)
 
     return L
 
-def direct_interpolation(nodes):
-    x = sp.Symbol('x')
-    L = lagrange_interpolation(x, nodes)
+def forward_interpolation(nodes):
+    #if not sp.is_monotonic(f, sp.Interval.open(a, b)):
+        x = sp.Symbol('x')
+    
+        L = 0
+        for k in range(n + 1):
+            numerator, denominator = 1, 1
+            for j in range (n + 1):
+                if j == k:
+                    continue
+                
+                numerator *= (x - nodes[j])
+                denominator *= (nodes[k] - nodes[j])
+            
+            L += f_func(nodes[k]) * (numerator / denominator)
 
-    y = sp.nsolve(L, x, 0)
-    return y
+
+        y = sp.nsolve(L, x, 0)
+        return y, L
+
+def backward_intepolation(nodes):
+    #if not sp.is_monotonic(f, sp.Interval.open(a, b)):
+        y = sp.Symbol('y')
+    
+        L = 0
+        for k in range(n + 1):
+            numerator, denominator = 1, 1
+            for j in range (n + 1):
+                if j == k:
+                    continue
+                
+                numerator *= (y - f_func(nodes[j]))
+                denominator *= (f_func(nodes[k]) - f_func(nodes[j]))
+            
+            L += nodes[k] * (numerator / denominator)
+    
+        x = sp.nsolve(L, y, 0)
+        return x, L
 
 # Пошук точного розв'язку
 x = sp.Symbol('x')
@@ -61,8 +92,8 @@ exact_solution = sp.nsolve(f, x, 1)
 print(f"Точний розв'язок: {exact_solution}")
 
 # Дослідження інтервалу
-a = -5
-b = 5
+a = 0
+b = 1
 
 if not is_valid_interval(a, b, exact_solution):
    print("Жоден розв'язок не належить вказаному інтервалу")
@@ -76,5 +107,9 @@ nodes = get_nodes(a, b, m)
 print(f"Вузли інтерполяції: {nodes}\nКрок інтерполяції: {nodes[1] - nodes[0]}")
 
 # Пряма інтерполяція
-direct_solution = direct_interpolation(nodes)
-print(f"Пряма інтерполяція: {direct_solution}")
+forward_solution, forward_polinom = forward_interpolation(nodes)
+print(f"Пряма інтерполяція: {forward_solution}")
+
+# Зворотня інтерполяція
+backward_solution, backward_polinom = backward_intepolation(nodes)
+print(f"Зворотня інтерполяція: {backward_solution}")
